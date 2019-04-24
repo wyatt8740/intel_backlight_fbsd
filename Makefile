@@ -1,6 +1,6 @@
 CC ?= clang
 CFLAGS +=
-LDFLAGS = -ldrm_intel -lpciaccess
+LDFLAGS = -ldrm_intel -lpciaccess -lm
 
 INCS = -I/usr/local/include -I/usr/local/include/libdrm
 LIBS = -L/usr/local/lib

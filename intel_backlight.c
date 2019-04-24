@@ -31,6 +31,8 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+/* wyatt floating point */
+#include <math.h>
 
 #include "intel_gpu_tools.h"
 
@@ -104,13 +106,18 @@ int main(int argc, char** argv)
 	current = reg_read(currentReg) & BACKLIGHT_DUTY_CYCLE_MASK;
 	max = reg_read(maxReg) >> 16;
 
-	min = 0.5 + 0.5 * max / 100.0;	// 0.5%
+	/*	min = 0.5 + 0.5 * max / 100.0; */	// 0.5%
+	/* 0.5% min is incredibly stupid. 0 is in the original linux tool
+           (which turns off the backlight) --wyatt */
+	min=0;
 	/*
 	printf ("min: %d, NUM_ELEMENTS(brightness_levels): %d\n", min,
 		NUM_ELEMENTS(brightness_levels));
 	*/
-	result = 0.5 + current * 100.0 / max;
-	printf ("Current backlight value: %d%% (%d/%d)\n", result, current, max);
+	result = current * 100.0 / max;
+	double resultfloat = current * 100.0 / max;
+	printf ("set backlight to %.2f%% (%d/%d)\n", resultfloat, current, max);
+	/*	printf ("Current backlight value: %d%% (%d/%d)\n", result, current, max);*/
 
 	if (argc > 1) {
 		uint32_t v;
@@ -121,15 +128,15 @@ int main(int argc, char** argv)
 		else {
 			errno = 0;
 			char *endptr;
-			long val = strtol(argv[1], &endptr, 10);
+			double val = strtod(argv[1], &endptr);
 
-			if((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))
+			if((errno == ERANGE && (val == HUGE_VAL || val == HUGE_VALF || val == HUGE_VALL || val == 0))
 			   || (errno != 0 && val == 0) || endptr == argv[1]) {
 				print_usage();
 				return result;
 			}
 
-			v = 0.5 + val * max / 100.0;
+			v = (uint32_t)(val * max / 100.0);
 		}
 	    /*
 		printf("v: %d\n", v);
@@ -145,8 +152,9 @@ int main(int argc, char** argv)
 		reg_write(currentReg,
 				  (reg_read(currentReg) &~ BACKLIGHT_DUTY_CYCLE_MASK) | v);
 		(void) reg_read(currentReg);
-		result = 0.5 + v * 100.0 / max;
-		printf ("set backlight to %d%% (%d/%d)\n", result, v, max);
+		result = v * 100.0 / max;
+		double resultfloat = v * 100.0 / max;
+		printf ("set backlight to %.2f%% (%d/%d)\n", resultfloat, v, max);
 	}
 	return result;
 }
