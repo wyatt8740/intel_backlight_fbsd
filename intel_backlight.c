@@ -107,8 +107,7 @@ int main(int argc, char** argv)
 	max = reg_read(maxReg) >> 16;
 
 	/*	min = 0.5 + 0.5 * max / 100.0; */	// 0.5%
-	/* 0.5% min is incredibly stupid. 0 is in the original linux tool
-           (which turns off the backlight) --wyatt */
+	/* 0.5% min is dumb since it prevents turning off the backlight. */
 	min=0;
 	/*
 	printf ("min: %d, NUM_ELEMENTS(brightness_levels): %d\n", min,

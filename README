@@ -1,3 +1,12 @@
+This fork of the FreeBSD fork of Intel_Backlight (originally of
+intel-gpu-tools) reverts a seemingly senseless change which prevented
+actually turning _off_ the backlight in the FreeBSD version. This was
+easily done in the original Linux version, and I used it frequently.
+
+It also adds finer grained control via support for decimal numbers
+in command line input.
+
+##########
 This allows to control the backlight level on certain Intel(R) GPUs,
 including i915.
 
